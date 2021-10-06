@@ -1,7 +1,5 @@
 package com.dd;
 
-import com.dd.circular.progress.button.R;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -16,6 +14,8 @@ import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.StateSet;
 import android.widget.Button;
+
+import com.dd.circular.progress.button.R;
 
 public class CircularProgressButton extends Button {
 
@@ -38,10 +38,10 @@ public class CircularProgressButton extends Button {
 
     private StateManager mStateManager;
     private State mState;
-    private String mIdleText;
-    private String mCompleteText;
-    private String mErrorText;
-    private String mProgressText;
+    private CharSequence mIdleText;
+    private CharSequence mCompleteText;
+    private CharSequence mErrorText;
+    private CharSequence mProgressText;
 
     private int mColorProgress;
     private int mColorIndicator;
@@ -79,18 +79,20 @@ public class CircularProgressButton extends Button {
     }
 
     private void init(Context context, AttributeSet attributeSet) {
-        mStrokeWidth = (int) getContext().getResources().getDimension(R.dimen.cpb_stroke_width);
+        if (!isInEditMode()) {
+            mStrokeWidth = (int) getContext().getResources().getDimension(R.dimen.cpb_stroke_width);
 
-        initAttributes(context, attributeSet);
+            initAttributes(context, attributeSet);
 
-        mMaxProgress = 100;
-        mState = State.IDLE;
-        mStateManager = new StateManager(this);
+            mMaxProgress = 100;
+            mState = State.IDLE;
+            mStateManager = new StateManager(this);
 
-        setText(mIdleText);
+            setText(mIdleText);
 
-        initIdleStateDrawable();
-        setBackgroundCompat(mIdleStateDrawable);
+            initIdleStateDrawable();
+            setBackgroundCompat(mIdleStateDrawable);
+        }
     }
 
     private void initErrorStateDrawable() {
@@ -345,7 +347,7 @@ public class CircularProgressButton extends Button {
         animation.start();
     }
 
-    private OnAnimationEndListener mProgressStateListener = new OnAnimationEndListener() {
+    private final OnAnimationEndListener mProgressStateListener = new OnAnimationEndListener() {
         @Override
         public void onAnimationEnd() {
             mMorphingInProgress = false;
@@ -385,7 +387,7 @@ public class CircularProgressButton extends Button {
 
     }
 
-    private OnAnimationEndListener mCompleteStateListener = new OnAnimationEndListener() {
+    private final OnAnimationEndListener mCompleteStateListener = new OnAnimationEndListener() {
         @Override
         public void onAnimationEnd() {
             if (mIconComplete != 0) {
@@ -431,7 +433,7 @@ public class CircularProgressButton extends Button {
 
     }
 
-    private OnAnimationEndListener mIdleStateListener = new OnAnimationEndListener() {
+    private final OnAnimationEndListener mIdleStateListener = new OnAnimationEndListener() {
         @Override
         public void onAnimationEnd() {
             removeIcon();
@@ -471,7 +473,7 @@ public class CircularProgressButton extends Button {
         animation.start();
     }
 
-    private OnAnimationEndListener mErrorStateListener = new OnAnimationEndListener() {
+    private final OnAnimationEndListener mErrorStateListener = new OnAnimationEndListener() {
         @Override
         public void onAnimationEnd() {
             if (mIconError != 0) {
@@ -527,7 +529,6 @@ public class CircularProgressButton extends Button {
     /**
      * Set the View's background. Masks the API changes made in Jelly Bean.
      */
-    @SuppressWarnings("deprecation")
     @SuppressLint("NewApi")
     public void setBackgroundCompat(Drawable drawable) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -543,6 +544,9 @@ public class CircularProgressButton extends Button {
         if (mMorphingInProgress || getWidth() == 0) {
             return;
         }
+
+        if(isInEditMode())
+            return;
 
         mStateManager.saveProgress(this);
 
@@ -587,27 +591,27 @@ public class CircularProgressButton extends Button {
         background.setStrokeColor(color);
     }
 
-    public String getIdleText() {
+    public CharSequence getIdleText() {
         return mIdleText;
     }
 
-    public String getCompleteText() {
+    public CharSequence getCompleteText() {
         return mCompleteText;
     }
 
-    public String getErrorText() {
+    public CharSequence getErrorText() {
         return mErrorText;
     }
 
-    public void setIdleText(String text) {
+    public void setIdleText(CharSequence text) {
         mIdleText = text;
     }
 
-    public void setCompleteText(String text) {
+    public void setCompleteText(CharSequence text) {
         mCompleteText = text;
     }
 
-    public void setErrorText(String text) {
+    public void setErrorText(CharSequence text) {
         mErrorText = text;
     }
 
